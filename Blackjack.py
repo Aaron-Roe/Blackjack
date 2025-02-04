@@ -5,3 +5,14 @@ class game():
                 'AS' 'KS' 'QS' 'JS' '10S' '9S' '8S' '7S' '6S' '5S' '4S' '3S' '2S'
                 'AC' 'KC' 'QC' 'JC' '10C' '9C' '8C' '7C' '6C' '5C' '4C' '3C' '2D'
                 'AD' 'KD' 'QD' 'JD' '10D' '9D' '8D' '7D' '6D' '5D' '4D' '3D' '2D']
+
+    def shuffle():
+    
+    def deal():
+   
+    def playerHand():
+   
+    def givemoney():
+
+
+
