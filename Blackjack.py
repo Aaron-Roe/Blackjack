@@ -28,7 +28,48 @@ class Deck:
         return self.game_cards.pop()
 
 class Player: # player values like hand and balance 
-    pass
+    def __init__(self, player_balance = 1000):
+        self.player_balance = player_balance
+        self.hand = [[]]
+        self.player_wager = []
+
+    def place_wager(self, wager):
+        if wager <= self.player_balance:
+            self.player_wager.append(wager)
+            self.player_balance -= wager
+            return True
+        return False
+    
+    def recieve_card(self, game_card, index):
+        self.hand[index].append(game_card)
+
+    def get_hand_value(self, index):
+        hand_value = 0
+        number_of_aces = 0
+
+        for card in self.hand[index]:
+            hand_value += card.value
+            if card.rank == 'A':
+                number_of_aces += 1
+                
+        while hand_value > 21 and number_of_aces > 0:
+            hand_value -= 10
+            number_of_aces -= 1
+        
+        return hand_value
+
+    def  has_blackjack(self, index):
+        if (len(self.hand[index]) == 2, self.get_hand_value(index) == 21):
+            return True
+        return False
+
+    def clear_hand(self):
+        self.hand = [[]]
+        self.player_wager = []
+        
+        
+
+            
 
 class Game: #Blackjack game checks and play loop
     pass
