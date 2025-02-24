@@ -41,6 +41,7 @@ class Player: # player values like hand and balance
         return False
     
     def recieve_card(self, game_card, index):
+        # self.hand is not updating with another list / adding 
         self.hand[index].append(game_card)
 
     def get_hand_value(self, index):
