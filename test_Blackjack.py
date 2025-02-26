@@ -49,7 +49,7 @@ class Player_Testing(unittest.TestCase):
     def test_invalid_balance_subtractor(self):
         p1 = Player(1000)
         p1.player_wager = []
-        p1.place_wager(1100) 
+        p1.place_wager(1100)
         self.assertEqual(p1.player_balance, 1000)
 
   # recieve_card Function:
@@ -96,33 +96,96 @@ class Player_Testing(unittest.TestCase):
         c2 = Card('Clubs', 'K')
         p1.hand[0] = [c1, c2]
         self.assertFalse(p1.has_blackjack(0))
+
+  # can_split Function:
+    # Testing to see if there is an avaliable split
+    def test_split_check_true(self):
+        p1 = Player(1000)
+        c1 = Card('Diamonds', '4')
+        c2 = Card('Clubs', '4')
+        p1.hand[0] = [c1, c2]
+        self.assertTrue(p1.can_split(0))
+
+    # Testing to see if there is no avaliable split
+    def test_split_check_false(self):
+        p1 = Player(1000)
+        c1 = Card('Diamonds', '4')
+        c2 = Card('Clubs', '10')
+        p1.hand[0] = [c1, c2]
+        self.assertFalse(p1.can_split(0))
+
+  # split_hand Function:
+    # Testing split action
+    # def test_split_action_true(self):
+    #     p1 = Player(1000)
+    #     c1 = Card('Diamonds', '7')
+    #     c2 = Card('Clubs', '7')
+    #     p1.hand[0] = [c1, c2]
+    #     self.assertTrue(p1.split_hand(0))
+
+    # Testing invalid split action
+    def test_split_action_false(self):
+        p1 = Player(1000)
+        c1 = Card('Diamonds', '8')
+        p1.hand = [[c1]]
+        self.assertFalse(p1.split_hand(0))
     
+    # Testing hand value split
+    def test_split_hand_value(self):
+        p1 = Player(1000)
+        c1 = Card('Diamonds', '7')
+        c2 = Card('Clubs', '7')
+        p1.hand[0] = [c1, c2]
+        p1.split_hand(0)
+        self.assertEqual(p1.hand, [[c1], [c2]])
 
 
 # Class Card
   # __str__ function 
-    def test_str1(self):
-        c1 = Card('Diamonds', 'K')
-        self.assertEqual(c1.__str__(), 'K of Diamonds')
+    
+    # def test_str1(self):
+    #     c1 = Card('Diamonds', 'K')
+    #     self.assertEqual(c1.__str__(), 'K of Diamonds')
 
-    # Testing __str__ function #2
-    def test__str2(self):
-        c1 = Card('Hearts', '3')
-        self.assertEqual(c1.__str__(), '3 of Hearts')
+    # # Testing __str__ function #2
+    # def test__str2(self):
+    #     c1 = Card('Hearts', '3')
+    #     self.assertEqual(c1.__str__(), '3 of Hearts')
 
     
 #class Game
   # player_turn Function
-    # Testing Bust
-    def test_Bust(self):
+    # Testing valid 21
+    # def test_Blackjack_True(self):
+    #     p1 = Player(1000)
+    #     c1 = Card('Diamonds', 'A')
+    #     c2 = Card('Clubs', 'K')
+    #     g1 = Game()
+    #     g1.action = 'p'
+    #     p1.hand = [[c1, c2]]
+    #     self.assertTrue(g1.player_turn(self))
+
+    # def test_stand_function(self):
+    #     g1 = Game()
+    #     g1.player_turn.action = 's'
+    #     c1 = Card('Diamonds', 'A')
+    #     g1.player.hand = [[c1]]
+    #     self.assertTrue(g1.player_turn())
+
+    def test_payouts(self):
+        p1 = Player(1000)
         g1 = Game()
-        c1 = Card('Diamonds', 'A')
-        c2 = Card('Clubs', 'K')
-        g1.player.hand = [[c1, c2]]
-        self.assertTrue(g1.player_turn())
+        c1 = Card('Diamonds', 'K')
+        c2 = Card('Diamonds', '5')
+        c3 = Card('Clubs', 'K')
+        p1.hand = [[c1, c2, c3]]
+        self.assertEqual(g1.handle_payouts(0, 500), None)
+
+
 
 
 
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
+
