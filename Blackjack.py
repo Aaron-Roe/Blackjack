@@ -83,39 +83,40 @@ class Player:
         return self.get_hand_value(index) > 21
 
 
-class Game:
+class Game(Player):
     def __init__(self):
+        super().__init__()
         self.deck = Deck()
-        self.player = Player()
+        # self.player = Player
         self.dealer = Player()
 
     def deal_initial_cards(self):
         for _ in range(2):
-            self.player.recieve_card(self.deck.deal(), 0)
+            Player.recieve_card(self, self.deck.deal(), 0)
             self.dealer.recieve_card(self.deck.deal(), 0)
 
     def player_turn(self):
-        for i in range(len(self.player.hand)):
+        for i in range(len(self.hand)):
             while True:
-                if self.player.is_busted(i):
+                if Player.is_busted(self, i):
                     print(f"Bust! Hand {i + 1} is over 21.")
                     return False
-                if self.player.get_hand_value(i) == 21:
+                if Player.get_hand_value(self, i) == 21:
                     print(f"Hand {i + 1} has 21!")
                     return True
                 
                 action = input("Hit, Stand, or Split? (h/s/p): ").lower()
                 if action == 'h':
                     drawn_card = self.deck.deal()
-                    self.player.recieve_card(drawn_card, i)
-                    print(f"You drew: {drawn_card} - New hand value: {self.player.get_hand_value(i)}")
-                elif action == 'p' and self.player.can_split(i):
-                    if self.player.split_hand(i):
-                        self.player.recieve_card(self.deck.deal(), i)
-                        self.player.recieve_card(self.deck.deal(), -1)  # Deal to new hand
+                    Player.recieve_card(self, drawn_card, i)
+                    print(f"You drew: {drawn_card} - New hand value: {Player.get_hand_value(self, i)}")
+                elif action == 'p' and Player.can_split(self, i):
+                    if Player.split_hand(self, i):
+                        Player.recieve_card(self, self.deck.deal(), i)
+                        Player.recieve_card(self, self.deck.deal(), -1)  # Deal to new hand
                         print("Your hands after splitting:")
-                        for hand_index in range(len(self.player.hand)):
-                            print(f"Hand {hand_index + 1}: {[str(card) for card in self.player.hand[hand_index]]} - Value: {self.player.get_hand_value(hand_index)}")
+                        for hand_index in range(len(self.hand)):
+                            print(f"Hand {hand_index + 1}: {[str(card) for card in self.hand[hand_index]]} - Value: {Player.get_hand_value(self, hand_index)}")
                     else:
                         print("Cannot split.")
                 elif action == 's':
@@ -133,8 +134,8 @@ class Game:
         return not self.dealer.is_busted(0)
 
     def handle_payouts(self, hand_index, bet):
-        player_value = self.player.get_hand_value(hand_index)
-        dealer_value = self.dealer.get_hand_value(0)
+        player_value = Player.get_hand_value(self, hand_index)
+        dealer_value = self.dealer.get_hand_value(hand_index)
         
         # Player bust
         if player_value > 21:
@@ -144,33 +145,33 @@ class Game:
         # Dealer bust
         if dealer_value > 21:
             print(f"Dealer busts! Player's hand {hand_index + 1} wins!")
-            self.player.player_balance += bet * 2
+            self.player_balance += bet * 2
             return
             
         # Compare hands
         if player_value > dealer_value:
             print(f"Player's hand {hand_index + 1} wins! ({player_value} vs {dealer_value})")
-            self.player.player_balance += bet * 2
+            self.player_balance += bet * 2
         elif player_value == dealer_value:
             print(f"Hand {hand_index + 1} pushes! ({player_value} vs {dealer_value})")
-            self.player.player_balance += bet
+            self.player_balance += bet
         else:
             print(f"Dealer wins hand {hand_index + 1}! ({dealer_value} vs {player_value})")
 
     def play(self):
-        while self.player.player_balance > 0:
-            print(f"Player's balance: {self.player.player_balance}")
+        while self.player_balance > 0:
+            print(f"Player's balance: {self.player_balance}")
             bet = int(input("Enter bet amount: "))
-            if not self.player.place_wager(bet):
+            if not Player.place_wager(self, bet):
                 print("Insufficient balance!")
                 continue
 
-            self.player.clear_hand()
+            Player.clear_hand(self)
             self.dealer.clear_hand()
             self.deal_initial_cards()
 
             # Display initial hands
-            print(f"Your hand: {[str(card) for card in self.player.hand[0]]} - Value: {self.player.get_hand_value(0)}")
+            print(f"Your hand: {[str(card) for card in self.hand[0]]} - Value: {Player.get_hand_value(self, 0)}")
             print(f"Dealer's face-up card: {str(self.dealer.hand[0][0])}")
 
             # Player's turn
@@ -179,18 +180,23 @@ class Game:
             # Only continue to dealer's turn if player hasn't busted
             if player_not_busted:
                 self.dealer_turn()
+                num = 0
                 # Handle payouts for each hand
-                for i, bet in enumerate(self.player.player_wager):
-                    self.handle_payouts(i, bet)
+                for i in range(len(self.player_wager)):
+                    num += 1
+                Game.handle_payouts(self, num, bet)
+               
+                # for i, bet in enumerate(self.player_wager):
+                #     Game.handle_payouts(i, bet)
             else:
                 print("Player busts! Dealer wins!")
 
             # End of round
-            print(f"Player's new balance: {self.player.player_balance}")
+            print(f"Player's new balance: {self.player_balance}")
             play_again = input("Do you want to play again? (y/n): ").lower()
             if play_again != 'y':
                 break
 
-
-game = Game()
-game.play()
+if __name__ == "__main__":
+    game = Game()
+    game.play()
