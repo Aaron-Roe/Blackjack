@@ -154,7 +154,7 @@ class Player_Testing(unittest.TestCase):
 
     
 #class Game
-  # player_turn Function
+  # player_turn Function:
     # Testing valid 21
     # def test_Blackjack_True(self):
     #     p1 = Player(1000)
@@ -172,7 +172,8 @@ class Player_Testing(unittest.TestCase):
     #     c1 = Card('Diamonds', 'A')
     #     p1.hand = [[c1]]
     #     self.assertTrue(g1.player_turn())
-
+    
+   # handle_payouts Function:
     def test_payouts(self):
         p1 = Player(1000)
         g1 = Game()

@@ -15,6 +15,7 @@ class Card:
 
 
 class Deck:
+    # Adds all cards to a list and shuffles them
     def __init__(self, decks=2):
         self.game_cards = []
         for i in range(decks):
@@ -23,6 +24,7 @@ class Deck:
                     self.game_cards.append(Card(suit, rank))
         random.shuffle(self.game_cards)
 
+    # Returns the last card in the list and removes it from the list
     def deal(self):
         return self.game_cards.pop()
 
@@ -33,6 +35,7 @@ class Player:
         self.hand = [[]]  # Support for multiple hands
         self.player_wager = []
 
+    # Adds the new wager amount to the wager list
     def place_wager(self, wager):
         if wager <= self.player_balance:
             self.player_wager.append(wager)
@@ -40,9 +43,11 @@ class Player:
             return True
         return False
 
+    # Adds a card to the player's hand
     def recieve_card(self, game_card, index):
         self.hand[index].append(game_card)
 
+    # Increases the amount of Aces count and if there is an ace and the hand value is over 21, then Aces are reduced to 1 in value
     def get_hand_value(self, index):
         hand_value = 0
         number_of_aces = 0
@@ -58,16 +63,19 @@ class Player:
 
         return hand_value
 
+    # Checks hand for blackjacks
     def has_blackjack(self, index):
         if len(self.hand[index]) == 2 and self.get_hand_value(index) == 21:
             return True
         return False
 
+    # checks to see if the Player's first two cards are the same number and available to split
     def can_split(self, index):
         if len(self.hand[index]) == 2 and self.hand[index][0].rank == self.hand[index][1].rank:
             return True
         return False
 
+    # This splits the hand into two different hands to play with
     def split_hand(self, index):
         if self.can_split(index):
             card = self.hand[index].pop()
@@ -75,10 +83,12 @@ class Player:
             return True
         return False
 
+    # Resets the hand and wagers to an empty list
     def clear_hand(self):
         self.hand = [[]]  # Reset to one hand initially
         self.player_wager = []
 
+    # Checks to see if Player or Dealer hand is greater than 21 in value
     def is_busted(self, index):
         return self.get_hand_value(index) > 21
 
@@ -90,11 +100,13 @@ class Game(Player):
         # self.player = Player
         self.dealer = Player()
 
+    # Deals the first 2 cards to the player and dealer
     def deal_initial_cards(self):
         for _ in range(2):
             Player.recieve_card(self, self.deck.deal(), 0)
             self.dealer.recieve_card(self.deck.deal(), 0)
 
+    # This function runs different player functions and checks for inputs from the player using 'h' or 'p' or 's'
     def player_turn(self):
         for i in range(len(self.hand)):
             while True:
@@ -125,6 +137,7 @@ class Game(Player):
                     print("Invalid action! Please choose 'h', 's', or 'p'.")
         return True
 
+    # Keeps dealing to dealer until dealer is above 17 in card value and then checks to see if dealer busts
     def dealer_turn(self):
         print(f"Dealer's full hand: {[str(card) for card in self.dealer.hand[0]]} - Value: {self.dealer.get_hand_value(0)}")
         while self.dealer.get_hand_value(0) < 17:
@@ -133,6 +146,7 @@ class Game(Player):
             print(f"Dealer drew: {drawn_card} - New value: {self.dealer.get_hand_value(0)}")
         return not self.dealer.is_busted(0)
 
+    # Updates the balance if player wins or loses
     def handle_payouts(self, hand_index, bet):
         player_value = Player.get_hand_value(self, hand_index)
         dealer_value = self.dealer.get_hand_value(hand_index)
@@ -158,6 +172,7 @@ class Game(Player):
         else:
             print(f"Dealer wins hand {hand_index + 1}! ({dealer_value} vs {player_value})")
 
+    # runs play loop and calls functions to start the game
     def play(self):
         while self.player_balance > 0:
             print(f"Player's balance: {self.player_balance}")
