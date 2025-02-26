@@ -166,10 +166,11 @@ class Player_Testing(unittest.TestCase):
     #     self.assertTrue(g1.player_turn(self))
 
     # def test_stand_function(self):
+    #     p1 = Player(1000)
     #     g1 = Game()
-    #     g1.player_turn.action = 's'
+    #     g1.action = 's'
     #     c1 = Card('Diamonds', 'A')
-    #     g1.player.hand = [[c1]]
+    #     p1.hand = [[c1]]
     #     self.assertTrue(g1.player_turn())
 
     def test_payouts(self):
