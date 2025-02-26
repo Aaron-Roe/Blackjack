@@ -105,12 +105,12 @@ class Game(Player):
                     print(f"Hand {i + 1} has 21!")
                     return True
                 
-                action = input("Hit, Stand, or Split? (h/s/p): ").lower()
-                if action == 'h':
+                self.action = input("Hit, Stand, or Split? (h/s/p): ").lower()
+                if self.action == 'h':
                     drawn_card = self.deck.deal()
                     Player.recieve_card(self, drawn_card, i)
                     print(f"You drew: {drawn_card} - New hand value: {Player.get_hand_value(self, i)}")
-                elif action == 'p' and Player.can_split(self, i):
+                elif self.action == 'p' and Player.can_split(self, i):
                     if Player.split_hand(self, i):
                         Player.recieve_card(self, self.deck.deal(), i)
                         Player.recieve_card(self, self.deck.deal(), -1)  # Deal to new hand
@@ -119,7 +119,7 @@ class Game(Player):
                             print(f"Hand {hand_index + 1}: {[str(card) for card in self.hand[hand_index]]} - Value: {Player.get_hand_value(self, hand_index)}")
                     else:
                         print("Cannot split.")
-                elif action == 's':
+                elif self.action == 's':
                     return True
                 else:
                     print("Invalid action! Please choose 'h', 's', or 'p'.")
