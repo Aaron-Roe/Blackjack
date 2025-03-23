@@ -141,16 +141,16 @@ class Player_Testing(unittest.TestCase):
 
 
 # Class Card
-  # __str__ function 
+    # __str__ function 
     
-    # def test_str1(self):
-    #     c1 = Card('Diamonds', 'K')
-    #     self.assertEqual(c1.__str__(), 'K of Diamonds')
+    def test_str1(self):
+        c1 = Card('Diamonds', 'K')
+        self.assertEqual(c1.__str__(), 'K of Diamonds')
 
-    # # Testing __str__ function #2
-    # def test__str2(self):
-    #     c1 = Card('Hearts', '3')
-    #     self.assertEqual(c1.__str__(), '3 of Hearts')
+    # Testing __str__ function #2
+    def test__str2(self):
+        c1 = Card('Hearts', '3')
+        self.assertEqual(c1.__str__(), '3 of Hearts')
 
     
 #class Game
