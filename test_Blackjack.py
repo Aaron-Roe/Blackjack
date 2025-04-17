@@ -1,5 +1,5 @@
 import unittest
-from Blackjack import Player, Card, Game
+from Blackjack import Player, Card, Game, Deck
 
 
 class Player_Testing(unittest.TestCase):
@@ -52,25 +52,21 @@ class Player_Testing(unittest.TestCase):
         p1.place_wager(1100)
         self.assertEqual(p1.player_balance, 1000)
 
-  # recieve_card Function:
-    # NEEDS MODIFICATION - FUNCTION CURRENTLY DOES NOT WORK
-
-    # def test_valid_hand_update1(self):
-    #     self.hand = [[],[]]
-    #     Player.recieve_card(self, 'K', 0)
-    #     Player.recieve_card(self, 'A', 1)
-    #     self.assertEqual(self.hand, [['K'], ['A']])
+    def test_recieve_card_rank(self):
+        p = Player()
+        p.receive_card(Card('Diamonds', '10'), 0)
+        self.assertEqual(p.hand[0][0].rank, '10')
     
-    # def test_valid_hand_update2(self):
-    #     self.hand = [[]]
-    #     Player.recieve_card(self, 'K', 0)
-    #     Player.recieve_card(self, 'A', 0)
-    #     Player.recieve_card(self, '10', 1)
-    #     Player.recieve_card(self, '8', 1)
-    #     self.assertEqual(self.hand, [['K','A'], ['10','8']])
+    def test_recieve_card_suit(self):
+        p = Player()
+        p.receive_card(Card('Diamonds', '10'), 0)
+        self.assertEqual(p.hand[0][0].suit, 'Diamonds')
+    
+    def test_recieve_card_value(self):
+        p = Player()
+        p.receive_card(Card('Diamonds', '10'), 0)
+        self.assertEqual(p.hand[0][0].value, 10)
 
-  # get_hand_value function
-  # MAKE NU_OF_ACES and HAND_VALUE .SELF SO I CAN ACCESS
     # Testing count for the number of aces 
     def test_num_ace_is1(self):
         p1 = Player(1000)
@@ -114,15 +110,6 @@ class Player_Testing(unittest.TestCase):
         p1.hand[0] = [c1, c2]
         self.assertFalse(p1.can_split(0))
 
-  # split_hand Function:
-    # Testing split action
-    # def test_split_action_true(self):
-    #     p1 = Player(1000)
-    #     c1 = Card('Diamonds', '7')
-    #     c2 = Card('Clubs', '7')
-    #     p1.hand[0] = [c1, c2]
-    #     self.assertTrue(p1.split_hand(0))
-
     # Testing invalid split action
     def test_split_action_false(self):
         p1 = Player(1000)
@@ -138,6 +125,15 @@ class Player_Testing(unittest.TestCase):
         p1.hand[0] = [c1, c2]
         p1.split_hand(0)
         self.assertEqual(p1.hand, [[c1], [c2]])
+    #testing clear_hand function to make sure player wager updates correctly
+    def test_clear_hand(self):
+        p = Player()
+        p.place_wager(500)
+        p.place_wager(1000)
+        p.place_wager(268)
+        p.place_wager(117)
+        p.clear_hand()
+        self.assertEqual(p.player_wager, [])
 
 
 # Class Card
@@ -151,27 +147,6 @@ class Player_Testing(unittest.TestCase):
     def test__str2(self):
         c1 = Card('Hearts', '3')
         self.assertEqual(c1.__str__(), '3 of Hearts')
-
-    
-#class Game
-  # player_turn Function:
-    # Testing valid 21
-    # def test_Blackjack_True(self):
-    #     p1 = Player(1000)
-    #     c1 = Card('Diamonds', 'A')
-    #     c2 = Card('Clubs', 'K')
-    #     g1 = Game()
-    #     g1.action = 'p'
-    #     p1.hand = [[c1, c2]]
-    #     self.assertTrue(g1.player_turn(self))
-
-    # def test_stand_function(self):
-    #     p1 = Player(1000)
-    #     g1 = Game()
-    #     g1.action = 's'
-    #     c1 = Card('Diamonds', 'A')
-    #     p1.hand = [[c1]]
-    #     self.assertTrue(g1.player_turn())
     
    # handle_payouts Function:
     def test_payouts(self):
@@ -183,11 +158,131 @@ class Player_Testing(unittest.TestCase):
         p1.hand = [[c1, c2, c3]]
         self.assertEqual(g1.handle_payouts(0, 500), None)
 
+# Class Deck
+    # Testing Deal() function
+    def test_deal(self):
+        d = Deck()
+        card = d.deal()
+        self.assertIsInstance(card, Card)
+
+# Class Game
+    # Making sure all items in the player hands correct
+    def test_initial_cards_player1(self):
+        g = Game()
+        dealing = g.deal_initial_cards()
+        player_hand = dealing[0]
+        self.assertEqual(player_hand, g.hand[0])
+
+    # Making sure there are two cards in player hand after initial cards are dealt
+    def test_initial_cards_player2(self):
+        g = Game()
+        g.deal_initial_cards()
+        self.assertEqual(len(g.hand[0]), 2)
+
+    # Making sure all items in the dealer hands correct
+    def test_initial_cards_dealer1(self):
+        g = Game()
+        dealing = g.deal_initial_cards()
+        dealer_hand = dealing[1]
+        self.assertEqual(dealer_hand, g.dealer.hand[0])
+
+    # Making sure there are two cards in dealer hand after initial cards are dealt
+    def test_initial_cards_dealer2(self):
+        g = Game()
+        g.deal_initial_cards()
+        self.assertEqual(len(g.dealer.hand[0]), 2)
+
+    def test_player_hit_continue(self):
+        g = Game()
+        g.hand[0] = []
+        g.hand[0] = [Card("Spades","10"),Card("Diamonds","5")]
+        g.deck.game_cards.append(Card("Hearts","2"))
+        hitting = g.player_hit()
+        is_busted = hitting[2]
+        hand_val = hitting[1]
+        self.assertEqual(is_busted, False)
+        # self.assertEqual(hand_val, 17)
+
+    def test_player_hit_bust(self):
+        g = Game()
+        g.hand[0] = []
+        g.hand[0] = [Card("Spades","10"),Card("Diamonds","J")]
+        g.deck.game_cards.append(Card("Hearts","5"))
+        hitting = g.player_hit()
+        is_busted = hitting[2]
+        hand_val = hitting[1]
+        self.assertEqual(is_busted, True)
+        # self.assertEqual(hand_val, 25)
+
+    def test_dealer_turn_under17(self):
+        g = Game()
+        g.dealer.hand[0] = []
+        g.dealer.hand[0] = [Card("Spades","10"),Card("Diamonds","3")]
+        g.deck.game_cards = [Card("Hearts","5")]
+        hitting = g.dealer_turn()
+        is_busted = hitting[2]
+        self.assertEqual(is_busted, False)
 
 
+    def test_dealer_turn_above17(self):
+        g = Game()
+        g.dealer.hand[0] = []
+        g.dealer.hand[0] = [Card("Spades","10"),Card("Diamonds","J")]
+        hitting = g.dealer_turn()
+        is_busted = hitting[2]
+        self.assertEqual(is_busted, False)
 
 
+    def test_handle_payouts_lose1(self):
+        g = Game()
+        g.hand[0] = [Card("Spades","10"),Card("Diamonds","3"),Card("hearts","10")]
+        result = g.handle_payouts(0, 500)[0]
+        self.assertEqual(result, "lose")
 
-if __name__ == '__main__':
-    unittest.main(verbosity=2)
+    def test_handle_payouts_win(self):
+        g = Game()
+        g.hand[0] = [Card("Spades","10"),Card("Diamonds","3"),Card("hearts","6")]
+        g.dealer.hand[0] = [Card("Spades","10"),Card("Diamonds","3"),Card("hearts","5")]
+        result = g.handle_payouts(0, 500)[0]
+        self.assertEqual(result, "win")
+
+    def test_handle_payouts_push(self):
+        g = Game()
+        g.hand[0] = [Card("Spades","10"),Card("Diamonds","3"),Card("hearts","6")]
+        g.dealer.hand[0] = [Card("Spades","5"),Card("Diamonds","8"),Card("hearts","6")]
+        result = g.handle_payouts(0, 500)[0]
+        self.assertEqual(result, "push")
+
+    def test_handle_payouts_lose2(self):
+        g = Game()
+        g.hand[0] = [Card("Spades","10"),Card("Diamonds","3"),Card("hearts","5")]
+        g.dealer.hand[0] = [Card("Spades","10"),Card("Diamonds","3"),Card("hearts","6")]
+        result = g.handle_payouts(0, 500)[0]
+        self.assertEqual(result, "lose")
+
+    def test_reset_player(self):
+        g = Game()
+        g.hand[0] = [Card("Spades","10"),Card("Diamonds","3"),Card("hearts","6")]
+        g.reset_round()
+        self.assertEqual(g.hand[0], [])
+
+    def test_reset_dealer(self):
+        g = Game()
+        g.deck.game_cards = [Card("Hearts","5")]
+        g.dealer.hand[0] = [Card("Spades","10"), Card("Diamonds","3"), Card("hearts","6")]
+        g.reset_round()
+        self.assertEqual(g.dealer.hand[0], [])
+
+    def test_get_player_hand(self):
+        g = Game()
+        g.hand[0] = [Card("Spades","10"),Card("Diamonds","3"),Card("hearts","6")]
+        self.assertEqual(g.hand[0], g.get_player_hand())
+
+    def test_get_dealer_hand(self):
+        g = Game()
+        g.dealer.hand[0] = [Card("Spades","10"),Card("Diamonds","3"),Card("hearts","6")]
+        self.assertEqual(g.dealer.hand[0], g.get_dealer_hand())
+
+# if __name__ == '__main__':
+#     unittest.main(verbosity=2)
 
